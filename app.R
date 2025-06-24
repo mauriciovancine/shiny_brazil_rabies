@@ -39,33 +39,74 @@ ui <- fluidPage(
   
   # add an option to select state, can only select one state at a time.  
   fluidRow(
-    column(3,
-           div(style = "text-align: center;",
-               img(src = "https://upload.wikimedia.org/wikipedia/commons/0/0a/Logo_Unesp.svg", 
-                   alt = "UNESP", 
-                   style = "max-height: 80px; max-width: 100%; object-fit: contain;")
-           )
+    column(8, 
+           selectInput("state_select", 
+                       "Selecione o Estado:", 
+                       choices = NULL,
+                       selected = NULL),
+           leafletOutput("map", height = "75vh")
     ),
-    column(3,
-           div(style = "text-align: center;",
-               img(src = "https://scontent.fcpq5-1.fna.fbcdn.net/v/t39.30808-6/300404000_506547754611842_924131957748489075_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeEd7f1yur83TUS9IBcfvsTRXaj2RscBpjZdqPZGxwGmNqRgs1sZpHfPgW9fGdnAsRorCzV40OzbeLDjJNDXsHXm&_nc_ohc=NyQtim2ljOQQ7kNvwGhf0Xk&_nc_oc=Adlodt_lsl9-ZCAcz7tLZjzGXrG0fSY1uhsmHGuxFk9Qlp1Jw5wfyaKsoC71i1iXBL1jpQPYvaG2ltKTj8BSSf1e&_nc_zt=23&_nc_ht=scontent.fcpq5-1.fna&_nc_gid=_Z8mO-nSnX45xpFY_2YhUQ&oh=00_AfMVS3yUjHJu7FrCVt77gYr8QdwITLaGrXJPR_Ml0hiAJg&oe=68607DD8", 
-                   alt = "Instituto de Biociências", 
-                   style = "max-height: 80px; max-width: 100%; object-fit: contain;")
+    
+    # tab where info about the select municipe will be displayed
+    column(4, 
+           h4("Dados do Município"),
+           div(id = "loading", style = "display: none; text-align: center; padding: 20px;",
+               tags$div(class = "spinner", style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"),
+               tags$p("Carregando dados do município..."),
+               tags$style(HTML("@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }"))
+           ),
+           verbatimTextOutput("municipal_data"),
+           
+           # add two options, one to download the information of the selected state and another one to download everything
+           div(style = "margin-top: 20px;",
+               h4("Baixar Dados"),
+               downloadButton("download_all", 
+                              "Baixar Dataset Completo", 
+                              class = "btn btn-primary",
+                              style = "width: 100%; margin-bottom: 10px;"),
+               downloadButton("download_state", 
+                              "Baixar Dados do Estado Selecionado", 
+                              class = "btn btn-success",
+                              style = "width: 100%;")
            )
-    ),
-    column(3,
-           div(style = "text-align: center;",
-               img(src = "https://ib.rc.unesp.br/Home/Departamentos47/ecologia/logo-leec.jpg", 
-                   alt = "LEEC", 
-                   style = "max-height: 80px; max-width: 100%; object-fit: contain;")
-           )
-    ),
-    column(3,
-           div(style = "text-align: center;",
-               img(src = "https://www.fcf.unicamp.br/wp-content/uploads/2022/05/fapesp.png", 
-                   alt = "FAPESP", 
-                   style = "max-height: 80px; max-width: 100%; object-fit: contain;")
-           )
+    )
+  ),
+  
+  # Add logos section at the bottom
+  br(),
+  hr(),
+  div(
+    style = "background-color: #ffffff; padding: 20px; margin-top: 30px; text-align: center; border-top: 2px solid #e5e5e5;",
+    h5("Apoio Institucional", style = "margin-bottom: 20px; color: #666;"),
+    fluidRow(
+      column(3,
+             div(style = "text-align: center;",
+                 img(src = "https://upload.wikimedia.org/wikipedia/commons/0/0a/Logo_Unesp.svg", 
+                     alt = "UNESP", 
+                     style = "max-height: 80px; max-width: 100%; object-fit: contain;")
+             )
+      ),
+      column(3,
+             div(style = "text-align: center;",
+                 img(src = "https://scontent.fcpq5-1.fna.fbcdn.net/v/t39.30808-6/300404000_506547754611842_924131957748489075_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeEd7f1yur83TUS9IBcfvsTRXaj2RscBpjZdqPZGxwGmNqRgs1sZpHfPgW9fGdnAsRorCzV40OzbeLDjJNDXsHXm&_nc_ohc=NyQtim2ljOQQ7kNvwGhf0Xk&_nc_oc=Adlodt_lsl9-ZCAcz7tLZjzGXrG0fSY1uhsmHGuxFk9Qlp1Jw5wfyaKsoC71i1iXBL1jpQPYvaG2ltKTj8BSSf1e&_nc_zt=23&_nc_ht=scontent.fcpq5-1.fna&_nc_gid=_Z8mO-nSnX45xpFY_2YhUQ&oh=00_AfMVS3yUjHJu7FrCVt77gYr8QdwITLaGrXJPR_Ml0hiAJg&oe=68607DD8", 
+                     alt = "Instituto de Biociências", 
+                     style = "max-height: 80px; max-width: 100%; object-fit: contain;")
+             )
+      ),
+      column(3,
+             div(style = "text-align: center;",
+                 img(src = "https://ib.rc.unesp.br/Home/Departamentos47/ecologia/logo-leec.jpg", 
+                     alt = "LEEC", 
+                     style = "max-height: 80px; max-width: 100%; object-fit: contain;")
+             )
+      ),
+      column(3,
+             div(style = "text-align: center;",
+                 img(src = "https://www.fcf.unicamp.br/wp-content/uploads/2022/05/fapesp.png", 
+                     alt = "FAPESP", 
+                     style = "max-height: 80px; max-width: 100%; object-fit: contain;")
+             )
+      )
     )
   )
 )
@@ -149,7 +190,7 @@ server <- function(input, output, session) {
         label = ~NM_MUN,
         layerId = ~NM_MUN
       )
-  
+    
     # Get data for clicked municipality, I decided to display columns 14-41 but you can add more.
     municipal_info <- filtered_data()[filtered_data()$NM_MUN == clicked_municipality, 14:41]
     
